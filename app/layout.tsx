@@ -3,6 +3,7 @@ import { Inter } from 'next/font/google'
 // import { Analytics } from '@vercel/analytics/next'
 import { ThemeProvider } from '@/components/theme-provider'
 import { QueryProvider } from '@/components/providers/query-provider'
+import { AuthProvider } from '@/contexts/auth-context'
 import { Toaster } from '@/components/ui/sonner'
 import './globals.css'
 
@@ -46,8 +47,10 @@ export default function RootLayout({
           disableTransitionOnChange
         >
           <QueryProvider>
-            <Toaster position="top-right" />
-            {children}
+            <AuthProvider>
+              <Toaster position="top-right" />
+              {children}
+            </AuthProvider>
           </QueryProvider>
         </ThemeProvider>
         {/* <Analytics /> */}

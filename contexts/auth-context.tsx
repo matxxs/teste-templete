@@ -25,64 +25,48 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined)
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null)
   const [loading, setLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
   const router = useRouter()
   const pathname = usePathname()
 
   const fetchUser = useCallback(async () => {
-    const token = authService.getToken()
-    const isLoginPage = pathname === ROUTES.LOGIN
-
-    if (!token) {
-      if (!isLoginPage) {
-        router.replace("/error/403")
-      }
-      setLoading(false)
-      return
-    }
-
-    if (isTokenExpired(token)) {
-      authService.logout()
-      router.replace("/error/401")
-      setLoading(false)
-      return
-    }
-
     try {
-      const userData = await authService.getMe()
-      setUser(userData)
-      setError(null)
-    } catch (err: any) {
-      authService.logout()
-      setUser(null)
+      const token = authService.getToken()
+      const isLoginPage = pathname === ROUTES.LOGIN
 
-      const status = err.status || 500
-      router.replace(`/error/${status}`)
+      if (!token) {
+        setUser(null)
+        if (!isLoginPage) {
+          router.replace(ROUTES.LOGIN)
+        }
+        setLoading(false)
+        return
+      }
+
+      if (isTokenExpired(token)) {
+        authService.logout()
+        setUser(null)
+        router.replace(ROUTES.LOGIN)
+        setLoading(false)
+        return
+      }
+
+      try {
+        const userData = await authService.getMe()
+        setUser(userData)
+      } catch (err: any) {
+        console.error("[v0] Erro ao buscar usuário:", err)
+        authService.logout()
+        setUser(null)
+        router.replace(ROUTES.LOGIN)
+      }
     } finally {
       setLoading(false)
     }
-  }, [router])
+  }, [router, pathname])
 
   useEffect(() => {
     fetchUser()
   }, [fetchUser])
-
-  const login = async (username: string, senha: string) => {
-    setLoading(true)
-    setError(null)
-    try {
-      const response = await authService.login(username, senha)
-      authService.setToken(response.access_token)
-      const userData = await authService.getMe()
-      setUser(userData)
-      router.replace(ROUTES.HOME)
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Erro ao fazer login")
-      throw err
-    } finally {
-      setLoading(false)
-    }
-  }
 
   const logout = useCallback(() => {
     authService.logout()
@@ -90,26 +74,20 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     router.replace(ROUTES.LOGIN)
   }, [router])
 
-  const isPublicRoute = pathname === ROUTES.LOGIN
+  const isLoginPage = pathname === ROUTES.LOGIN
+  const isHomePage = pathname === ROUTES.HOME || pathname === ROUTES.DASHBOARD
 
   return (
     <AuthContext.Provider value={{ user, loading, logout }}>
-      {loading ? (
+      {loading && !isLoginPage ? (
         <div className="flex h-screen w-full items-center justify-center bg-background">
-          {/* Spinner de carregamento aqui */}
-          <p className="text-sm text-muted-foreground">Verificando acesso...</p>
+          <p className="text-sm text-muted-foreground">Carregando...</p>
         </div>
       ) : (
-        (!user && !isPublicRoute) ? null : children
+        children
       )}
     </AuthContext.Provider>
   )
-
-  // return (
-  //   <AuthContext.Provider value={{ user, loading, error, login, logout }}>
-  //     {children}
-  //   </AuthContext.Provider>
-  // )
 }
 
 export function useAuth() {
