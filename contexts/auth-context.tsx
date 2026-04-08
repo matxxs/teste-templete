@@ -25,7 +25,6 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined)
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null)
   const [loading, setLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
   const router = useRouter()
   const pathname = usePathname()
 
@@ -35,7 +34,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     
     if (!token) {
       if (!isLoginPage) {
-        router.replace("/error/403") 
+        router.replace(ROUTES.LOGIN) 
       }
       setLoading(false)
       return
@@ -43,7 +42,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     if (isTokenExpired(token)) {
       authService.logout()
-      router.replace("/error/401") 
+      router.replace(ROUTES.LOGIN) 
       setLoading(false)
       return
     }
@@ -51,38 +50,19 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     try {
       const userData = await authService.getMe()
       setUser(userData)
-      setError(null)
     } catch (err: any) {
+      console.error("[v0] Erro ao buscar usuário:", err)
       authService.logout()
       setUser(null)
-      
-      const status = err.status || 500
-      router.replace(`/error/${status}`)
+      router.replace(ROUTES.LOGIN)
     } finally {
       setLoading(false)
     }
-  }, [router])
+  }, [router, pathname])
 
   useEffect(() => {
     fetchUser()
   }, [fetchUser])
-
-  const login = async (email: string, senha: string) => {
-    setLoading(true)
-    setError(null)
-    try {
-      const response = await authService.login(email, senha)
-      authService.setToken(response.access_token)
-      const userData = await authService.getMe()
-      setUser(userData)
-      router.replace(ROUTES.HOME)
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Erro ao fazer login")
-      throw err
-    } finally {
-      setLoading(false)
-    }
-  }
 
   const logout = useCallback(() => {
     authService.logout()
@@ -96,20 +76,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     <AuthContext.Provider value={{ user, loading, logout }}>
       {loading ? (
         <div className="flex h-screen w-full items-center justify-center bg-background">
-           {/* Spinner de carregamento aqui */}
            <p className="text-sm text-muted-foreground">Verificando acesso...</p>
         </div>
-      ) : (
-        (!user && !isPublicRoute) ? null : children
-      )}
+      ) : isPublicRoute || user ? (
+        children
+      ) : null}
     </AuthContext.Provider>
   )
-
-  // return (
-  //   <AuthContext.Provider value={{ user, loading, error, login, logout }}>
-  //     {children}
-  //   </AuthContext.Provider>
-  // )
 }
 
 export function useAuth() {
