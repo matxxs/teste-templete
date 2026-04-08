@@ -37,10 +37,10 @@ export async function apiClient<T = unknown>(
   return res.json()
 }
 
-export async function uploadFile(
+export async function uploadFile<T = unknown>(
   path: string,
   formData: FormData
-): Promise<unknown> {
+): Promise<T> {
   const token =
     typeof window !== "undefined" ? localStorage.getItem("token") : null
 

@@ -197,7 +197,7 @@ export const driveService = {
     if (nome?.trim()) formData.append("nome", nome.trim())
     if (grupoId) formData.append("grupo_id", grupoId)
 
-    return uploadFile(API_ENDPOINTS.DRIVE.UPLOAD, formData)
+    return uploadFile<ItemDrive>(API_ENDPOINTS.DRIVE.UPLOAD, formData)
   },
 
   async download(id: string): Promise<Blob> {

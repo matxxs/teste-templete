@@ -177,7 +177,7 @@ export function DriveFiltersComponent({
         {filtros.cadastro_id ? (
           <span className="inline-flex items-center gap-1.5 rounded-md border border-primary/30 bg-primary/10 px-2.5 py-1.5 text-sm font-medium text-primary">
             {pessoaLabel ||
-              (userCadastroId === filtros.cadastro_id
+              (userCadastroId === Number(filtros.cadastro_id)
                 ? userName || "Eu"
                 : "Pessoa")}
             <button
