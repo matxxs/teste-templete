@@ -33,22 +33,22 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       const token = authService.getToken()
       const isLoginPage = pathname === ROUTES.LOGIN
 
-      if (!token) {
-        setUser(null)
-        if (!isLoginPage) {
-          router.replace(ROUTES.LOGIN)
-        }
-        setLoading(false)
-        return
-      }
-
-      if (isTokenExpired(token)) {
-        authService.logout()
-        setUser(null)
-        router.replace(ROUTES.LOGIN)
-        setLoading(false)
-        return
-      }
+      //      if (!token) {
+      //        setUser(null)
+      //        if (!isLoginPage) {
+      //          router.replace(ROUTES.LOGIN)
+      //        }
+      //        setLoading(false)
+      //        return
+      //      }
+      //
+      //      if (isTokenExpired(token)) {
+      //        authService.logout()
+      //        setUser(null)
+      //        router.replace(ROUTES.LOGIN)
+      //        setLoading(false)
+      //        return
+      //      }
 
       try {
         const userData = await authService.getMe()
