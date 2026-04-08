@@ -32,10 +32,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const fetchUser = useCallback(async () => {
     const token = authService.getToken()
     const isLoginPage = pathname === ROUTES.LOGIN
-    
+
     if (!token) {
       if (!isLoginPage) {
-        router.replace("/error/403") 
+        router.replace("/error/403")
       }
       setLoading(false)
       return
@@ -43,7 +43,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     if (isTokenExpired(token)) {
       authService.logout()
-      router.replace("/error/401") 
+      router.replace("/error/401")
       setLoading(false)
       return
     }
@@ -55,7 +55,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     } catch (err: any) {
       authService.logout()
       setUser(null)
-      
+
       const status = err.status || 500
       router.replace(`/error/${status}`)
     } finally {
@@ -67,11 +67,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     fetchUser()
   }, [fetchUser])
 
-  const login = async (email: string, senha: string) => {
+  const login = async (username: string, senha: string) => {
     setLoading(true)
     setError(null)
     try {
-      const response = await authService.login(email, senha)
+      const response = await authService.login(username, senha)
       authService.setToken(response.access_token)
       const userData = await authService.getMe()
       setUser(userData)
@@ -96,8 +96,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     <AuthContext.Provider value={{ user, loading, logout }}>
       {loading ? (
         <div className="flex h-screen w-full items-center justify-center bg-background">
-           {/* Spinner de carregamento aqui */}
-           <p className="text-sm text-muted-foreground">Verificando acesso...</p>
+          {/* Spinner de carregamento aqui */}
+          <p className="text-sm text-muted-foreground">Verificando acesso...</p>
         </div>
       ) : (
         (!user && !isPublicRoute) ? null : children
