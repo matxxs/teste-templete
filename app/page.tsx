@@ -38,7 +38,7 @@ export default function LoginPage() {
     setMounted(true)
 
     if (authService.isAuthenticated()) {
-      router.replace(ROUTES.DASHBOARD)
+      router.replace(ROUTES.HOME)
     }
   }, [router])
 

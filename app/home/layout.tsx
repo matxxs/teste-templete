@@ -22,7 +22,7 @@ import { cn } from "@/lib/utils"
 import { ROUTES } from "@/constants/routes"
 
 const navItems = [
-  { href: ROUTES.DASHBOARD, label: "Dashboard", icon: LayoutDashboard },
+  // { href: ROUTES.DASHBOARD, label: "Dashboard", icon: LayoutDashboard },
   { href: ROUTES.HOME, label: "Arquivos", icon: Home },
   { href: ROUTES.CADASTROS, label: "Usuarios", icon: Users, adminOnly: true },
   { href: ROUTES.GRUPOS, label: "Grupos", icon: Tags },
