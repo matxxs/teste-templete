@@ -75,7 +75,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, [router])
 
   const isLoginPage = pathname === ROUTES.LOGIN
-  const isHomePage = pathname === ROUTES.HOME || pathname === ROUTES.DASHBOARD
+  const isHomePage = pathname === ROUTES.HOME
 
   return (
     <AuthContext.Provider value={{ user, loading, logout }}>
