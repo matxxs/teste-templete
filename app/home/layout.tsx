@@ -206,8 +206,8 @@ export default function HomeLayout({
   children: React.ReactNode
 }) {
   return (
-    //<AuthProvider>
-    <HomeLayoutContent>{children}</HomeLayoutContent>
-    //</AuthProvider>
+    <AuthProvider>
+      <HomeLayoutContent>{children}</HomeLayoutContent>
+    </AuthProvider>
   )
 }
