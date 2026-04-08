@@ -13,7 +13,7 @@ interface DriveFiltersProps {
   grupos: Grupo[]
   cadastros: CadastroItem[]
   userNivelAcesso: string | null | undefined
-  userCadastroId: number | null | undefined
+  userCadastroId: string | null | undefined
   userName: string | undefined
   pessoaLabel: string
   setPessoaLabel: (label: string) => void
@@ -109,10 +109,10 @@ export function DriveFiltersComponent({
   const cadastrosExibir = cadastros.slice(0, 5)
   const pessoaOpcoes =
     !isAdminUser && userCadastroId != null
-      ? [{ CADASTRO_ID: userCadastroId, NOME: userName || "Eu", EMAIL: null }].filter(
+      ? [{ usuario_id: userCadastroId, username: userName || "Eu", nome: userName || "Eu", email: "", nivel_acesso: "", ativo: true, data_criacao: null }].filter(
           (c) =>
             !buscaPessoa.trim() ||
-            c.NOME.toLowerCase().includes(buscaPessoa.trim().toLowerCase())
+            c.nome.toLowerCase().includes(buscaPessoa.trim().toLowerCase())
         )
       : cadastrosExibir
 
@@ -217,19 +217,19 @@ export function DriveFiltersComponent({
                   ) : (
                     pessoaOpcoes.map((c) => (
                       <button
-                        key={c.CADASTRO_ID}
+                        key={c.usuario_id}
                         type="button"
                         className="w-full px-2 py-2 text-left text-sm hover:bg-muted/50 rounded cursor-pointer"
                         onClick={() => {
                           setFiltros((f) => ({
                             ...f,
-                            cadastro_id: String(c.CADASTRO_ID),
+                            cadastro_id: String(c.usuario_id),
                           }))
-                          setPessoaLabel(c.NOME)
+                          setPessoaLabel(c.nome)
                           setDropdownAberto(null)
                         }}
                       >
-                        {c.NOME}
+                        {c.nome}
                       </button>
                     ))
                   )}

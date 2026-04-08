@@ -3,10 +3,10 @@ import { API_ENDPOINTS } from "@/constants/api-endpoints"
 import type { User, AuthResponse } from "@/interfaces"
 
 export const authService = {
-  async login(login: string, senha: string): Promise<AuthResponse> {
+  async login(username: string, senha: string): Promise<AuthResponse> {
     return apiClient<AuthResponse>(API_ENDPOINTS.AUTH.LOGIN, {
       method: "POST",
-      body: JSON.stringify({ login, senha }),
+      body: JSON.stringify({ username, senha }),
     })
   },
 

@@ -25,28 +25,30 @@ export const cadastrosService = {
   },
 
   async create(
-    data: Omit<CadastroForm, "ATIVO">
+    data: Omit<CadastroForm, "ativo">
   ): Promise<CadastroItem> {
     return apiClient<CadastroItem>(API_ENDPOINTS.CADASTROS.LIST, {
       method: "POST",
       body: JSON.stringify({
-        NOME: data.NOME.trim(),
-        EMAIL: data.EMAIL.trim() || null,
-        NIVEL_ACESSO: data.NIVEL_ACESSO,
+        username: data.username.trim(),
+        nome: data.nome.trim(),
+        email: data.email.trim(),
+        nivel_acesso: data.nivel_acesso,
         senha: data.senha || undefined,
       }),
     })
   },
 
   async update(
-    id: number,
+    id: string,
     data: Partial<CadastroForm>
   ): Promise<CadastroItem> {
     const payload: Record<string, unknown> = {}
-    if (data.NOME) payload.NOME = data.NOME.trim()
-    if (data.EMAIL !== undefined) payload.EMAIL = data.EMAIL.trim() || null
-    if (data.NIVEL_ACESSO) payload.NIVEL_ACESSO = data.NIVEL_ACESSO
-    if (data.ATIVO) payload.ATIVO = data.ATIVO
+    if (data.username) payload.username = data.username.trim()
+    if (data.nome) payload.nome = data.nome.trim()
+    if (data.email !== undefined) payload.email = data.email.trim()
+    if (data.nivel_acesso) payload.nivel_acesso = data.nivel_acesso
+    if (data.ativo !== undefined) payload.ativo = data.ativo
     if (data.senha) payload.senha = data.senha
 
     return apiClient<CadastroItem>(API_ENDPOINTS.CADASTROS.DETAIL(id), {
@@ -55,7 +57,7 @@ export const cadastrosService = {
     })
   },
 
-  async delete(id: number): Promise<void> {
+  async delete(id: string): Promise<void> {
     await apiClient(API_ENDPOINTS.CADASTROS.DETAIL(id), { method: "DELETE" })
   },
 

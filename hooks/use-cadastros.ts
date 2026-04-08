@@ -31,14 +31,14 @@ export function useCreateCadastro() {
   const queryClient = useQueryClient()
 
   return useMutation({
-    mutationFn: (data: Omit<CadastroForm, "ATIVO">) =>
+    mutationFn: (data: Omit<CadastroForm, "ativo">) =>
       cadastrosService.create(data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.cadastros.all })
-      toast.success("Cadastro criado")
+      toast.success("Usuário criado com sucesso")
     },
     onError: (error: Error) => {
-      toast.error(error.message || "Erro ao criar cadastro")
+      toast.error(error.message || "Erro ao criar usuário")
     },
   })
 }
@@ -47,14 +47,14 @@ export function useUpdateCadastro() {
   const queryClient = useQueryClient()
 
   return useMutation({
-    mutationFn: ({ id, data }: { id: number; data: Partial<CadastroForm> }) =>
+    mutationFn: ({ id, data }: { id: string; data: Partial<CadastroForm> }) =>
       cadastrosService.update(id, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.cadastros.all })
-      toast.success("Cadastro atualizado")
+      toast.success("Usuário atualizado")
     },
     onError: (error: Error) => {
-      toast.error(error.message || "Erro ao atualizar cadastro")
+      toast.error(error.message || "Erro ao atualizar usuário")
     },
   })
 }
@@ -63,10 +63,10 @@ export function useDeleteCadastro() {
   const queryClient = useQueryClient()
 
   return useMutation({
-    mutationFn: (id: number) => cadastrosService.delete(id),
+    mutationFn: (id: string) => cadastrosService.delete(id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.cadastros.all })
-      toast.success("Cadastro excluído")
+      toast.success("Usuário excluído")
     },
     onError: (error: Error) => {
       toast.error(error.message || "Erro ao excluir")

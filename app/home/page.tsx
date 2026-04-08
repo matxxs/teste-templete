@@ -1,20 +1,19 @@
 "use client"
 
 import { useState, useCallback, useEffect } from "react"
+import Link from "next/link"
 import { useAuth } from "@/contexts/auth-context"
 import { Input } from "@/components/ui/input"
-import { ChevronRight, Search, ShieldAlert } from "lucide-react"
-import { ScreenSubNavigation } from "@/components/shared/screen-sub-navigation"
+import { Button } from "@/components/ui/button"
+import { ChevronRight, Search, History } from "lucide-react"
 import { DriveFiltersComponent } from "@/components/features/drive/drive-filters"
 import { DriveTable } from "@/components/features/drive/drive-table"
-import { DriveAuditoria } from "@/components/features/drive/drive-auditoria"
 import {
   CreateFolderModal,
   UploadModal,
 } from "@/components/features/drive/drive-modals"
 import {
   useDriveList,
-  useDriveAuditoria,
   useCreateFolder,
   useUploadFile,
   useDeleteDriveItem,
@@ -23,6 +22,7 @@ import {
 import { useGruposList } from "@/hooks/use-grupos"
 import { useCadastrosList } from "@/hooks/use-cadastros"
 import { isAdmin } from "@/lib/helpers"
+import { ROUTES } from "@/constants/routes"
 import type { DriveFilters, ItemDrive } from "@/interfaces"
 
 const initialFilters: DriveFilters = {
@@ -42,25 +42,17 @@ export default function HomePage() {
   const [pessoaLabel, setPessoaLabel] = useState("")
   const [buscaPessoa, setBuscaPessoa] = useState("")
   const [buscaGrupo, setBuscaGrupo] = useState("")
-  const [pageAuditoria, setPageAuditoria] = useState(1)
 
-  // Modals
   const [modalNovaPasta, setModalNovaPasta] = useState(false)
   const [modalUpload, setModalUpload] = useState(false)
   const [parentIdParaCriar, setParentIdParaCriar] = useState<string | null>(null)
 
   const admin = isAdmin(user?.nivel_acesso)
 
-  // Queries
   const { data: driveData, isLoading: loadingDrive, refetch: refetchDrive } = useDriveList(parentId, filtros)
   const { data: gruposData } = useGruposList()
   const { data: cadastrosData } = useCadastrosList(1, buscaPessoa, admin)
-  const { data: auditoriaData, isLoading: loadingAuditoria } = useDriveAuditoria(
-    pageAuditoria,
-    admin
-  )
 
-  // Mutations
   const createFolderMutation = useCreateFolder()
   const uploadFileMutation = useUploadFile()
   const deleteItemMutation = useDeleteDriveItem()
@@ -127,7 +119,6 @@ export default function HomePage() {
     setModalUpload(true)
   }
 
-  // Refetch on filter changes
   useEffect(() => {
     refetchDrive()
   }, [
@@ -141,30 +132,29 @@ export default function HomePage() {
     refetchDrive,
   ])
 
-  const mainContent = (
-    <div className="p-4 lg:p-6 space-y-4 max-w-7xl mx-auto">
-      {/* Header: Home */}
-      <div className="flex flex-wrap items-center justify-between gap-4">
-        <div className="flex flex-wrap items-center gap-1.5">
+  return (
+    <div className="p-6 space-y-6 max-w-7xl mx-auto">
+      <div className="flex items-center justify-between">
+        <div className="flex flex-wrap items-center gap-2">
           <button
             type="button"
             onClick={() => navegarPara(null)}
-            className="flex items-center gap-1 text-sm font-medium text-foreground hover:text-primary transition-colors"
+            className="flex items-center gap-1.5 text-base font-semibold text-foreground hover:text-primary transition-colors"
           >
-            Home
+            Arquivos
           </button>
           {driveData?.breadcrumb && driveData.breadcrumb.length > 0 && (
             <>
               {driveData.breadcrumb.map((b) => (
                 <span
                   key={b.id}
-                  className="flex items-center gap-1 text-sm text-muted-foreground"
+                  className="flex items-center gap-1.5 text-sm text-muted-foreground"
                 >
-                  <ChevronRight className="h-3.5 w-3.5" />
+                  <ChevronRight className="h-4 w-4" />
                   <button
                     type="button"
                     onClick={() => navegarPara(b.id)}
-                    className="hover:text-foreground transition-colors"
+                    className="hover:text-foreground transition-colors font-medium"
                   >
                     {b.nome}
                   </button>
@@ -173,28 +163,33 @@ export default function HomePage() {
             </>
           )}
         </div>
+
+        <Link href="/home/arquivos/historico">
+          <Button variant="outline" size="sm" className="gap-2 h-9">
+            <History className="h-4 w-4" />
+            Histórico
+          </Button>
+        </Link>
       </div>
 
-      {/* Search */}
-      <div className="relative min-w-[200px] max-w-sm">
-        <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+      <div className="relative min-w-[200px] max-w-md">
+        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
         <Input
-          placeholder="Pesquisar..."
+          placeholder="Pesquisar arquivos..."
           value={filtros.pesquisa}
           onChange={(e) => setFiltros((f) => ({ ...f, pesquisa: e.target.value }))}
           onKeyDown={(e) => e.key === "Enter" && handleSearch()}
-          className="pl-8 h-8 text-sm"
+          className="pl-10 h-10 text-sm"
         />
       </div>
 
-      {/* Filters */}
       <DriveFiltersComponent
         filtros={filtros}
         setFiltros={setFiltros}
         grupos={gruposData || []}
         cadastros={cadastrosData?.items || []}
         userNivelAcesso={user?.nivel_acesso}
-        userCadastroId={user?.cadastro_id}
+        userCadastroId={user?.usuario_id}
         userName={user?.nome}
         pessoaLabel={pessoaLabel}
         setPessoaLabel={setPessoaLabel}
@@ -207,7 +202,6 @@ export default function HomePage() {
         onUpload={handleOpenUpload}
       />
 
-      {/* Table */}
       <DriveTable
         items={driveData?.items || []}
         loading={loadingDrive}
@@ -218,7 +212,6 @@ export default function HomePage() {
         onUploadHere={handleUploadHere}
       />
 
-      {/* Modals */}
       <CreateFolderModal
         open={modalNovaPasta}
         onClose={() => setModalNovaPasta(false)}
@@ -234,23 +227,5 @@ export default function HomePage() {
         grupos={gruposData || []}
       />
     </div>
-  )
-
-  const logContent = (
-    <DriveAuditoria
-      items={auditoriaData?.items || []}
-      loading={loadingAuditoria}
-      page={pageAuditoria}
-      totalPages={auditoriaData?.pages || 1}
-      onPageChange={setPageAuditoria}
-    />
-  )
-
-  return (
-    <ScreenSubNavigation
-      mainContent={mainContent}
-      logContent={logContent}
-      isVisible={true}
-    />
   )
 }

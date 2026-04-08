@@ -74,21 +74,21 @@ export function DriveAuditoria({
               </TableHeader>
               <TableBody>
                 {items.map((a) => {
-                  const dadosAtuais = a.DADOS_NOVOS || a.DADOS_ANTIGOS
+                  const dadosAtuais = a.dados_novos || a.dados_antigos
                   const nomeItem =
                     (dadosAtuais as Record<string, unknown>)?.nome || "Item removido"
 
                   return (
-                    <TableRow key={a.AUD_ID} className="border-border/50">
+                    <TableRow key={a.aud_id} className="border-border/50">
                       <TableCell className="py-2 px-3 text-xs text-muted-foreground font-mono">
-                        {formatDate(a.DATA_AUDITORIA)}
+                        {formatDate(a.data_auditoria)}
                       </TableCell>
                       <TableCell className="py-2 px-3">
                         <Badge
-                          variant={getActionBadgeVariant(a.ACAO)}
+                          variant={getActionBadgeVariant(a.acao)}
                           className="text-[10px] px-1.5 py-0 font-medium"
                         >
-                          {translateAction(a.ACAO)}
+                          {translateAction(a.acao)}
                         </Badge>
                       </TableCell>
                       <TableCell className="py-2 px-3">
@@ -97,7 +97,7 @@ export function DriveAuditoria({
                         </span>
                       </TableCell>
                       <TableCell className="py-2 px-3 text-xs text-muted-foreground hidden md:table-cell">
-                        {a.USUARIO_SESSAO ?? "Sistema"}
+                        {a.usuario_sessao ?? "Sistema"}
                       </TableCell>
                     </TableRow>
                   )

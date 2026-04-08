@@ -13,7 +13,7 @@ export const API_ENDPOINTS = {
   },
   CADASTROS: {
     LIST: "/api/cadastros",
-    DETAIL: (id: number) => `/api/cadastros/${id}`,
+    DETAIL: (id: string) => `/api/cadastros/${id}`,
     AUDITORIA: "/api/auditoria/cadastros",
   },
   GRUPOS: {

@@ -1,14 +1,15 @@
 // Auth types
 export interface User {
-  usuario_id: number
-  cadastro_id: number | null
+  usuario_id: string
+  username: string
   nome: string
-  email: string | null
+  email: string
   nivel_acesso: string
+  ativo: boolean
 }
 
 export interface LoginCredentials {
-  login: string
+  username: string
   senha: string
 }
 
@@ -24,7 +25,7 @@ export interface ItemDrive {
   nome: string
   tipo: "pasta" | "arquivo"
   path_disco: string
-  cadastro_id: number
+  usuario_id: string
   usuario_sessao: string | null
   proprietario_nome: string | null
   grupo_id: string | null
@@ -54,42 +55,50 @@ export interface DriveFilters {
 }
 
 export interface ItemDriveAuditoria {
-  AUD_ID: number
-  ITEM_ID: string
-  ACAO: string
-  USUARIO_SESSAO: string | null
-  DADOS_ANTIGOS: Record<string, unknown> | null
-  DADOS_NOVOS: Record<string, unknown> | null
-  DATA_AUDITORIA: string
+  aud_id: number
+  item_id: string
+  acao: string
+  usuario_sessao: string | null
+  dados_antigos: Record<string, unknown> | null
+  dados_novos: Record<string, unknown> | null
+  data_auditoria: string
 }
 
 // Cadastros types
 export interface CadastroItem {
-  CADASTRO_ID: number
-  NOME: string
-  EMAIL: string | null
-  NIVEL_ACESSO: string
-  ATIVO: string
-  DATA_CRIACAO: string | null
+  usuario_id: string
+  username: string
+  nome: string
+  email: string
+  nivel_acesso: string
+  ativo: boolean
+  data_criacao: string | null
 }
 
 export interface CadastroForm {
-  NOME: string
-  EMAIL: string
-  NIVEL_ACESSO: string
-  ATIVO: string
+  username: string
+  nome: string
+  email: string
+  nivel_acesso: string
+  ativo: boolean
   senha: string
 }
 
+export interface UsernameSuggestion {
+  value: string
+  available: boolean
+}
+
 export interface CadastroAuditoriaItem {
-  AUD_ID: number
-  CADASTRO_ID: number
-  NOME: string
-  EMAIL: string | null
-  ATIVO: string
-  USUARIO_SESSAO: string | null
-  ACAO: string
-  DATA_AUDITORIA: string | null
+  aud_id: number
+  usuario_id: string
+  username: string
+  nome: string
+  email: string
+  ativo: boolean
+  acao: string
+  usuario_sessao: string | null
+  data_auditoria: string | null
 }
 
 // Grupos types
