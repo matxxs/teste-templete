@@ -38,7 +38,7 @@ export default function LoginPage() {
     setMounted(true)
 
     if (authService.isAuthenticated()) {
-      router.replace(ROUTES.HOME)
+      router.replace(ROUTES.DASHBOARD)
     }
   }, [router])
 
@@ -78,7 +78,7 @@ export default function LoginPage() {
 
         <div className="flex flex-col gap-8">
           <div className="max-w-md">
-            <h1 className="text-4xl font-bold leading-tight tracking-tight text-balance">
+            <h1 className="text-4xl font-bold leading-tight tracking-tight text-balance lg:text-5xl">
               Gerencie seus documentos com simplicidade
             </h1>
             <p className="mt-4 text-primary-foreground/70 text-lg leading-relaxed">

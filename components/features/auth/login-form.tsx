@@ -29,7 +29,7 @@ export function LoginForm() {
       const response = await authService.login(username, senha)
       authService.setToken(response.access_token)
       toast.success("Login realizado com sucesso")
-      router.replace(ROUTES.HOME)
+      router.replace(ROUTES.DASHBOARD)
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Erro ao fazer login")
     } finally {

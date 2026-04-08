@@ -14,6 +14,7 @@ import {
   Sun,
   Tags,
   ChevronRight,
+  LayoutDashboard,
 } from "lucide-react"
 import { AuthProvider, useAuth } from "@/contexts/auth-context"
 import { isAdmin } from "@/lib/helpers"
@@ -21,6 +22,7 @@ import { cn } from "@/lib/utils"
 import { ROUTES } from "@/constants/routes"
 
 const navItems = [
+  { href: ROUTES.DASHBOARD, label: "Dashboard", icon: LayoutDashboard },
   { href: ROUTES.HOME, label: "Arquivos", icon: Home },
   { href: ROUTES.CADASTROS, label: "Usuarios", icon: Users, adminOnly: true },
   { href: ROUTES.GRUPOS, label: "Grupos", icon: Tags },
@@ -68,7 +70,7 @@ function HomeLayoutContent({ children }: { children: React.ReactNode }) {
   return (
     <div className="min-h-screen flex flex-col bg-background">
       {/* Header */}
-      <header className="sticky top-0 z-40 border-b bg-card/80 backdrop-blur-sm">
+      <header className="sticky top-0 z-40 border-b border-border/50 bg-card/95 backdrop-blur-md shadow-sm">
         <div className="flex items-center justify-between h-14 px-4 lg:px-6">
           {/* Logo + Nav */}
           <div className="flex items-center gap-6">
@@ -183,7 +185,9 @@ function HomeLayoutContent({ children }: { children: React.ReactNode }) {
                   ? "Usuarios"
                   : pathname.includes("grupos")
                     ? "Grupos"
-                    : "Arquivos"}
+                    : pathname.includes("dashboard")
+                      ? "Dashboard"
+                      : "Arquivos"}
               </span>
             </>
           )}
