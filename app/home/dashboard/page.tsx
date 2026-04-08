@@ -16,18 +16,9 @@ import {
 import Link from "next/link"
 import { ROUTES } from "@/constants/routes"
 import { isAdmin } from "@/lib/helpers"
-
-// Mock data para estatísticas
-const mockStats = {
-  totalUsuarios: 24,
-  totalArquivos: 156,
-  totalPastas: 32,
-  totalGrupos: 8,
-  arquivosHoje: 12,
-  usuariosAtivos: 18,
-  storageUsado: "2.4 GB",
-  storageTotal: "10 GB",
-}
+import { useCadastrosList } from "@/hooks/use-cadastros"
+import { useGruposList } from "@/hooks/use-grupos"
+import { useDriveList } from "@/hooks/use-drive"
 
 // Mock data para atividades recentes
 const mockAtividades = [
@@ -36,7 +27,7 @@ const mockAtividades = [
     usuario: "joao_silva",
     acao: "enviou",
     item: "Relatorio_Q1_2026.pdf",
-    tempo: "2 horas atrás",
+    tempo: "2 horas atras",
     tipo: "upload",
   },
   {
@@ -44,7 +35,7 @@ const mockAtividades = [
     usuario: "maria_santos",
     acao: "atualizou",
     item: "Planilha_Vendas.xlsx",
-    tempo: "5 horas atrás",
+    tempo: "5 horas atras",
     tipo: "update",
   },
   {
@@ -52,7 +43,7 @@ const mockAtividades = [
     usuario: "carlos_lima",
     acao: "criou grupo",
     item: "Financeiro",
-    tempo: "1 dia atrás",
+    tempo: "1 dia atras",
     tipo: "create",
   },
   {
@@ -60,7 +51,7 @@ const mockAtividades = [
     usuario: "ana_oliveira",
     acao: "baixou",
     item: "Contrato_Cliente.docx",
-    tempo: "1 dia atrás",
+    tempo: "1 dia atras",
     tipo: "download",
   },
   {
@@ -68,21 +59,34 @@ const mockAtividades = [
     usuario: "pedro_costa",
     acao: "criou pasta",
     item: "Projetos 2026",
-    tempo: "2 dias atrás",
+    tempo: "2 dias atras",
     tipo: "create",
   },
 ]
 
-// Mock data para tendências
-const mockTendencias = {
-  arquivos: { valor: 12, percentual: 15, positivo: true },
-  usuarios: { valor: 3, percentual: 8, positivo: true },
-  downloads: { valor: 45, percentual: -5, positivo: false },
-}
-
 export default function DashboardPage() {
   const { user } = useAuth()
   const admin = isAdmin(user?.nivel_acesso)
+
+  // Buscar dados reais/mockados dos hooks
+  const { data: cadastrosData } = useCadastrosList(1, undefined, admin)
+  const { data: gruposData } = useGruposList()
+  const { data: driveData } = useDriveList(null, {
+    pesquisa: "",
+    tipo: "",
+    cadastro_id: "",
+    grupo_id: "",
+    modificado: "",
+    modificado_apos: "",
+    modificado_antes: "",
+  })
+
+  // Calcular estatísticas dos dados
+  const totalUsuarios = cadastrosData?.total || 0
+  const usuariosAtivos = cadastrosData?.items?.filter((u) => u.ativo).length || 0
+  const totalGrupos = gruposData?.length || 0
+  const totalArquivos = driveData?.items?.filter((i) => i.tipo === "arquivo").length || 0
+  const totalPastas = driveData?.items?.filter((i) => i.tipo === "pasta").length || 0
 
   const getAtividadeIcon = (tipo: string) => {
     switch (tipo) {
@@ -101,17 +105,17 @@ export default function DashboardPage() {
 
   return (
     <div className="p-6 space-y-8 max-w-7xl mx-auto">
-      {/* Cabeçalho de boas-vindas */}
+      {/* Cabecalho de boas-vindas */}
       <div className="space-y-2">
         <h1 className="text-3xl font-bold tracking-tight text-foreground">
-          Bem-vindo, {user?.nome?.split(" ")[0] || "Usuário"}
+          Bem-vindo, {user?.nome?.split(" ")[0] || "Usuario"}
         </h1>
         <p className="text-muted-foreground leading-relaxed">
-          Aqui está um resumo das atividades do DocManager
+          Aqui esta um resumo das atividades do DocManager
         </p>
       </div>
 
-      {/* Cards de estatísticas */}
+      {/* Cards de estatisticas */}
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <Card className="border-border/50 shadow-sm hover:shadow-md transition-shadow">
           <CardHeader className="flex flex-row items-center justify-between pb-2">
@@ -121,13 +125,13 @@ export default function DashboardPage() {
             <FileText className="h-5 w-5 text-primary" />
           </CardHeader>
           <CardContent>
-            <div className="text-3xl font-bold text-foreground">{mockStats.totalArquivos}</div>
+            <div className="text-3xl font-bold text-foreground">{totalArquivos}</div>
             <div className="flex items-center gap-1 mt-1">
               <span className="text-xs text-green-600 dark:text-green-500 font-medium flex items-center gap-0.5">
                 <TrendingUp className="h-3 w-3" />
-                +{mockTendencias.arquivos.percentual}%
+                +15%
               </span>
-              <span className="text-xs text-muted-foreground">vs. mês passado</span>
+              <span className="text-xs text-muted-foreground">vs. mes passado</span>
             </div>
           </CardContent>
         </Card>
@@ -140,9 +144,9 @@ export default function DashboardPage() {
             <FolderOpen className="h-5 w-5 text-amber-500" />
           </CardHeader>
           <CardContent>
-            <div className="text-3xl font-bold text-foreground">{mockStats.totalPastas}</div>
+            <div className="text-3xl font-bold text-foreground">{totalPastas}</div>
             <p className="text-xs text-muted-foreground mt-1">
-              {mockStats.arquivosHoje} arquivos adicionados hoje
+              Organizando seus documentos
             </p>
           </CardContent>
         </Card>
@@ -151,14 +155,14 @@ export default function DashboardPage() {
           <Card className="border-border/50 shadow-sm hover:shadow-md transition-shadow">
             <CardHeader className="flex flex-row items-center justify-between pb-2">
               <CardTitle className="text-sm font-medium text-muted-foreground">
-                Usuários
+                Usuarios
               </CardTitle>
               <Users className="h-5 w-5 text-blue-500" />
             </CardHeader>
             <CardContent>
-              <div className="text-3xl font-bold text-foreground">{mockStats.totalUsuarios}</div>
+              <div className="text-3xl font-bold text-foreground">{totalUsuarios}</div>
               <p className="text-xs text-muted-foreground mt-1">
-                {mockStats.usuariosAtivos} ativos agora
+                {usuariosAtivos} ativos no sistema
               </p>
             </CardContent>
           </Card>
@@ -172,7 +176,7 @@ export default function DashboardPage() {
             <Tags className="h-5 w-5 text-green-500" />
           </CardHeader>
           <CardContent>
-            <div className="text-3xl font-bold text-foreground">{mockStats.totalGrupos}</div>
+            <div className="text-3xl font-bold text-foreground">{totalGrupos}</div>
             <p className="text-xs text-muted-foreground mt-1">
               Organizando seus arquivos
             </p>
@@ -180,7 +184,7 @@ export default function DashboardPage() {
         </Card>
       </div>
 
-      {/* Seção de atividades e atalhos */}
+      {/* Secao de atividades e atalhos */}
       <div className="grid gap-6 lg:grid-cols-3">
         {/* Atividades recentes */}
         <Card className="lg:col-span-2 border-border/50 shadow-sm">
@@ -218,10 +222,10 @@ export default function DashboardPage() {
           </CardContent>
         </Card>
 
-        {/* Atalhos rápidos */}
+        {/* Atalhos rapidos */}
         <Card className="border-border/50 shadow-sm">
           <CardHeader className="pb-4">
-            <CardTitle className="text-lg font-semibold">Acesso Rápido</CardTitle>
+            <CardTitle className="text-lg font-semibold">Acesso Rapido</CardTitle>
           </CardHeader>
           <CardContent className="pt-0">
             <div className="space-y-3">
@@ -247,7 +251,7 @@ export default function DashboardPage() {
                     <Users className="h-5 w-5" />
                   </div>
                   <div>
-                    <p className="text-sm font-semibold text-foreground">Usuários</p>
+                    <p className="text-sm font-semibold text-foreground">Usuarios</p>
                     <p className="text-xs text-muted-foreground">Gerenciar acessos</p>
                   </div>
                 </Link>
@@ -272,7 +276,7 @@ export default function DashboardPage() {
               <div className="flex items-center justify-between text-sm mb-2">
                 <span className="text-muted-foreground">Armazenamento</span>
                 <span className="font-medium text-foreground">
-                  {mockStats.storageUsado} / {mockStats.storageTotal}
+                  2.4 GB / 10 GB
                 </span>
               </div>
               <div className="w-full h-2 bg-muted rounded-full overflow-hidden">
@@ -282,7 +286,7 @@ export default function DashboardPage() {
                 />
               </div>
               <p className="text-xs text-muted-foreground mt-2">
-                24% do espaço utilizado
+                24% do espaco utilizado
               </p>
             </div>
           </CardContent>

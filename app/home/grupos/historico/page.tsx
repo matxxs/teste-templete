@@ -18,115 +18,14 @@ import { Pagination } from "@/components/shared/pagination"
 import { ArrowLeft, History } from "lucide-react"
 import { isAdmin, formatDate, getActionBadgeVariant, translateAction } from "@/lib/helpers"
 import { ROUTES } from "@/constants/routes"
-
-// Interface para auditoria de grupos
-interface GrupoAuditoriaItem {
-  aud_id: number
-  grupo_id: string
-  nome: string
-  cor_tag: string
-  descricao: string | null
-  acao: string
-  usuario_sessao: string | null
-  data_auditoria: string
-}
-
-// Mock data para auditoria de grupos
-const mockGruposAuditoria: GrupoAuditoriaItem[] = [
-  {
-    aud_id: 1,
-    grupo_id: "grp-001",
-    nome: "Financeiro",
-    cor_tag: "#3B82F6",
-    descricao: "Documentos financeiros da empresa",
-    acao: "INSERT",
-    usuario_sessao: "carlos_lima",
-    data_auditoria: "2026-04-08T14:30:00Z",
-  },
-  {
-    aud_id: 2,
-    grupo_id: "grp-002",
-    nome: "RH",
-    cor_tag: "#22C55E",
-    descricao: "Recursos Humanos",
-    acao: "INSERT",
-    usuario_sessao: "maria_santos",
-    data_auditoria: "2026-04-08T12:15:00Z",
-  },
-  {
-    aud_id: 3,
-    grupo_id: "grp-001",
-    nome: "Financeiro",
-    cor_tag: "#EF4444",
-    descricao: "Documentos financeiros e contábeis",
-    acao: "UPDATE",
-    usuario_sessao: "joao_silva",
-    data_auditoria: "2026-04-07T16:45:00Z",
-  },
-  {
-    aud_id: 4,
-    grupo_id: "grp-003",
-    nome: "Marketing",
-    cor_tag: "#F97316",
-    descricao: "Materiais de marketing",
-    acao: "INSERT",
-    usuario_sessao: "ana_oliveira",
-    data_auditoria: "2026-04-07T10:20:00Z",
-  },
-  {
-    aud_id: 5,
-    grupo_id: "grp-004",
-    nome: "Jurídico",
-    cor_tag: "#8B5CF6",
-    descricao: "Contratos e documentos legais",
-    acao: "INSERT",
-    usuario_sessao: "pedro_costa",
-    data_auditoria: "2026-04-06T09:00:00Z",
-  },
-  {
-    aud_id: 6,
-    grupo_id: "grp-005",
-    nome: "Temp",
-    cor_tag: "#6B7280",
-    descricao: null,
-    acao: "DELETE",
-    usuario_sessao: "carlos_lima",
-    data_auditoria: "2026-04-05T17:30:00Z",
-  },
-  {
-    aud_id: 7,
-    grupo_id: "grp-002",
-    nome: "Recursos Humanos",
-    cor_tag: "#22C55E",
-    descricao: "Departamento de RH - Documentos",
-    acao: "UPDATE",
-    usuario_sessao: "maria_santos",
-    data_auditoria: "2026-04-05T14:10:00Z",
-  },
-  {
-    aud_id: 8,
-    grupo_id: "grp-006",
-    nome: "Projetos",
-    cor_tag: "#14B8A6",
-    descricao: "Documentação de projetos",
-    acao: "INSERT",
-    usuario_sessao: "joao_silva",
-    data_auditoria: "2026-04-04T11:25:00Z",
-  },
-]
+import { useGruposAuditoria } from "@/hooks/use-grupos"
 
 export default function HistoricoGruposPage() {
   const { user } = useAuth()
   const [page, setPage] = useState(1)
   const admin = isAdmin(user?.nivel_acesso)
 
-  // Simulando paginação com mock data
-  const pageSize = 5
-  const totalPages = Math.ceil(mockGruposAuditoria.length / pageSize)
-  const paginatedItems = mockGruposAuditoria.slice(
-    (page - 1) * pageSize,
-    page * pageSize
-  )
+  const { data: auditoriaData, isLoading } = useGruposAuditoria(page, admin)
 
   if (!admin) {
     return (
@@ -134,7 +33,7 @@ export default function HistoricoGruposPage() {
         <Card className="border-border/50">
           <CardContent className="p-12 text-center">
             <p className="text-muted-foreground">
-              Você não tem permissão para acessar o histórico de grupos.
+              Voce nao tem permissao para acessar o historico de grupos.
             </p>
           </CardContent>
         </Card>
@@ -154,18 +53,25 @@ export default function HistoricoGruposPage() {
             </Link>
             <h1 className="text-2xl font-bold flex items-center gap-3 text-foreground tracking-tight">
               <History className="h-6 w-6 text-primary" />
-              Histórico de Grupos
+              Historico de Grupos
             </h1>
           </div>
           <p className="text-sm text-muted-foreground ml-11 leading-relaxed">
-            Todas as alterações realizadas nos grupos
+            Todas as alteracoes realizadas nos grupos
           </p>
         </div>
       </div>
 
       <Card className="border-border/50 shadow-sm overflow-hidden">
         <CardContent className="p-0">
-          {paginatedItems.length === 0 ? (
+          {isLoading ? (
+            <div className="py-24 text-center text-sm text-muted-foreground">
+              <div className="flex flex-col items-center gap-3">
+                <div className="h-8 w-8 border-2 border-primary border-t-transparent rounded-full animate-spin" />
+                <p>Carregando historico...</p>
+              </div>
+            </div>
+          ) : (auditoriaData?.items || []).length === 0 ? (
             <div className="py-16 text-center text-sm text-muted-foreground">
               Nenhum registro de auditoria encontrado.
             </div>
@@ -178,7 +84,7 @@ export default function HistoricoGruposPage() {
                       Data/Hora
                     </TableHead>
                     <TableHead className="text-xs font-semibold text-muted-foreground uppercase tracking-wider h-11 px-5">
-                      Ação
+                      Acao
                     </TableHead>
                     <TableHead className="text-xs font-semibold text-muted-foreground uppercase tracking-wider h-11 px-5">
                       Cor
@@ -187,7 +93,7 @@ export default function HistoricoGruposPage() {
                       Nome
                     </TableHead>
                     <TableHead className="text-xs font-semibold text-muted-foreground uppercase tracking-wider h-11 px-5 hidden md:table-cell">
-                      Descrição
+                      Descricao
                     </TableHead>
                     <TableHead className="text-xs font-semibold text-muted-foreground uppercase tracking-wider h-11 px-5 hidden lg:table-cell">
                       Por
@@ -195,7 +101,7 @@ export default function HistoricoGruposPage() {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {paginatedItems.map((a) => (
+                  {(auditoriaData?.items || []).map((a) => (
                     <TableRow key={a.aud_id} className="border-border/50">
                       <TableCell className="py-3 px-5 text-xs text-muted-foreground font-mono whitespace-nowrap">
                         {formatDate(a.data_auditoria)}
@@ -212,8 +118,8 @@ export default function HistoricoGruposPage() {
                         <span
                           className="inline-block w-5 h-5 rounded-full ring-2 ring-offset-2 ring-offset-background"
                           style={{
-                            backgroundColor: a.cor_tag,
-                            boxShadow: `0 0 0 2px ${a.cor_tag}20`,
+                            backgroundColor: a.cor_tag || "#3B82F6",
+                            boxShadow: `0 0 0 2px ${a.cor_tag || "#3B82F6"}20`,
                           }}
                         />
                       </TableCell>
@@ -235,9 +141,8 @@ export default function HistoricoGruposPage() {
 
               <Pagination
                 page={page}
-                totalPages={totalPages}
+                totalPages={auditoriaData?.pages || 1}
                 onPageChange={setPage}
-                variant="compact"
               />
             </>
           )}
