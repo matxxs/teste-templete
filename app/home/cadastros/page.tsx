@@ -119,7 +119,6 @@ export default function CadastrosPage() {
           nome: form.nome,
           email: form.email,
           nivel_acesso: form.nivel_acesso,
-          ativo: true,
           senha: form.senha,
         },
         { onSuccess: fecharModal }
