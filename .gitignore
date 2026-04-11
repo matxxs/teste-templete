@@ -40,3 +40,39 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 .env
+/dist/
+
+# claude code / agentes locais
+.agents/
+.claude/
+skills-lock.json
+memory/
+CLAUDE.local.md
+
+# editores / IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.history/
+
+# sistema operacional
+Thumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+ehthumbs.db
+
+# logs e caches diversos
+*.log
+logs/
+.cache/
+.turbo/
+.eslintcache
+.stylelintcache
+
+# arquivos temporários
+*.tmp
+*.bak
+*.orig
+*.rej

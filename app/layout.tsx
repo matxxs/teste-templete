@@ -1,13 +1,9 @@
 import type { Metadata } from 'next'
-import { Inter } from 'next/font/google'
-// import { Analytics } from '@vercel/analytics/next'
 import { ThemeProvider } from '@/components/theme-provider'
 import { QueryProvider } from '@/components/providers/query-provider'
 import { AuthProvider } from '@/contexts/auth-context'
 import { Toaster } from '@/components/ui/sonner'
 import './globals.css'
-
-const _inter = Inter({ subsets: ["latin"] })
 
 export const metadata: Metadata = {
   title: 'DocManager - Gerenciador de Documentos',
@@ -53,7 +49,6 @@ export default function RootLayout({
             </AuthProvider>
           </QueryProvider>
         </ThemeProvider>
-        {/* <Analytics /> */}
       </body>
     </html>
   )
